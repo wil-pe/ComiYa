@@ -6,8 +6,9 @@ import { BASE_DISCOUNT, GROUP_TIERS } from "@/config";
 import { NUTRITION } from "@/data/nutrition";
 import { productInfo } from "@/data/product-info";
 import { PRICES_OBSERVED_AT, type Product } from "@/data/products";
-import { formatSoles, percent, priceAt } from "@/lib/pricing";
+import { formatSoles, lineTotal, percent, priceAt } from "@/lib/pricing";
 import { unitLabel } from "@/lib/units";
+import { useCart } from "./cart-store";
 import { ProductPhoto } from "./product-photo";
 import { QtyControl } from "./qty-control";
 
@@ -33,6 +34,7 @@ export function ProductSheet({ products }: { products: Product[] }) {
   const pathname = usePathname();
   const params = useSearchParams();
   const dialog = useRef<HTMLDialogElement>(null);
+  const cart = useCart();
   const product = products.find((p) => p.id === params.get("p")) ?? null;
 
   useEffect(() => {
@@ -55,6 +57,7 @@ export function ProductSheet({ products }: { products: Product[] }) {
   const info = product ? productInfo(product.id, product.category) : null;
   const nutrition = product ? NUTRITION[product.id] : undefined;
   const best = GROUP_TIERS[GROUP_TIERS.length - 1].discount;
+  const qty = product ? (cart[product.id] ?? 0) : 0;
 
   return (
     <dialog
@@ -93,7 +96,7 @@ export function ProductSheet({ products }: { products: Product[] }) {
             </span>
           </div>
 
-          <div className="space-y-5 p-5 pb-8">
+          <div className="space-y-5 p-5 pb-6">
             <div>
               <h2 id="ficha-titulo" className="text-2xl leading-tight font-black">
                 {product.name}
@@ -119,8 +122,6 @@ export function ProductSheet({ products }: { products: Product[] }) {
             <p className="text-sm text-stone-600">
               👥 Si tus vecinos también piden para el mismo día, el precio baja hasta −{percent(best)}.
             </p>
-
-            <QtyControl product={product} />
 
             <section aria-labelledby="ficha-nutricion">
               <h3 id="ficha-nutricion" className="flex items-baseline justify-between font-extrabold">
@@ -184,6 +185,23 @@ export function ProductSheet({ products }: { products: Product[] }) {
               {product.source ?? "Tottus"}, {PRICES_OBSERVED_AT}.
               {product.unit === "kg" && " El peso final puede variar ligeramente."}
             </section>
+          </div>
+
+          {/* Barra fija: precio y botón siempre a mano mientras se lee la ficha */}
+          <div className="sticky bottom-0 z-10 border-t border-stone-200 bg-white/95 px-5 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-10px_24px_-14px_rgb(0_0_0/0.3)] backdrop-blur">
+            <div className="flex items-center gap-3">
+              <div className="shrink-0 leading-tight" aria-live="polite">
+                <p className="font-hand text-[1.75rem] leading-none font-bold text-leaf-dark">
+                  {formatSoles(qty ? lineTotal(price, qty) : price)}
+                </p>
+                <p className="text-xs font-semibold text-stone-500">
+                  {qty ? "en tu pedido" : unitLabel(product.unit)}
+                </p>
+              </div>
+              <div className="min-w-0 flex-1">
+                <QtyControl product={product} />
+              </div>
+            </div>
           </div>
         </div>
       )}
