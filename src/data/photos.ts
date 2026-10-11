@@ -4,6 +4,7 @@ export const PHOTOS = {
   "productos": [
     "ajo",
     "arroz",
+    "asado-tira",
     "bistec",
     "bonito",
     "brocoli",
@@ -30,12 +31,14 @@ export const PHOTOS = {
     "pechuga-pollo",
     "pepino",
     "perejil",
+    "perico",
     "pierna-pollo",
     "pimiento",
     "pina",
     "platano",
     "pollo-entero",
     "queso-fresco",
+    "reineta",
     "rocoto",
     "tomate",
     "trucha",
@@ -44,6 +47,10 @@ export const PHOTOS = {
     "zapallo"
   ],
   "categorias": [
+    "basicos",
+    "carnes",
+    "pescados",
+    "pollo",
     "verduras"
   ],
   "ambiente": [
