@@ -15,7 +15,12 @@ L'interface client est en espagnol (Pérou).
 | Commande fixe hebdomadaire (pause / suppression) | **Liste de courses** agrégée pour le marché |
 | Paiement Yape ou Plin (QR + numéro d'opération) | Modifier les prix supermarché / marquer « agotado » |
 | Achat groupé par condominio + lien d'invitation WhatsApp | Créer des condominios et leurs liens d'invitation |
-| Crédit (« saldo a favor ») automatique | |
+| Crédit (« saldo a favor ») automatique | Rendre du crédit (produit manquant ou abîmé) |
+| Fiche produit : photo, prix, valeurs nutritionnelles, conservation, allergènes | |
+| Recherche sans accents et avec synonymes (aguacate, cilantro, maíz…) | |
+| Choix « si un produit manque » (remplacer / ne pas l'apporter / WhatsApp) | |
+| « Volver a pedir » en un clic | |
+| Installable sur l'écran d'accueil du téléphone + aperçu WhatsApp | |
 
 ### Règles métier (modifiables dans `src/config.ts`)
 
@@ -51,6 +56,16 @@ Remplacer `public/qr/yape.svg` et `public/qr/plin.svg` par les QR de ton compte 
 
 Le flux actuel : le client paie, saisit son numéro d'opération → statut « Pago en revisión » → tu vérifies
 dans ton appli Yape/Plin et confirmes dans `/admin`.
+
+## Photos et fiches produit
+
+- Les photos sont dans `public/fotos` (WebP, 100 Ko max chacune) ; leurs auteurs et licences sont listés sur
+  `/creditos` (`src/data/photo-credits.ts`). Les 4 photos Wikimedia (CC BY-SA) exigent ce crédit.
+- Pour ajouter ou remplacer une photo : déposer le JPEG dans un dossier sous le nom du produit
+  (ex. `palta.jpg`) puis `python3 scripts/fotos.py ce-dossier`. Un produit sans photo affiche son emoji.
+- Valeurs nutritionnelles (`src/data/nutrition.ts`) : pour 100 g crus, tirées des *Tablas Peruanas de
+  Composición de Alimentos* (INS-CENAN 2017) et, à défaut, de l'USDA FoodData Central.
+- Conservation, allergènes et synonymes de recherche : `src/data/product-info.ts`.
 
 ## Développement local
 

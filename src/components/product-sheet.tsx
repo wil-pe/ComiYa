@@ -156,7 +156,9 @@ export function ProductSheet({ products }: { products: Product[] }) {
                     </div>
                   )}
                   <p className="mt-2 text-xs text-stone-500">
-                    Valores referenciales. Fuente: {nutrition.source}.
+                    Valores referenciales por 100 g de parte comestible, en crudo. Fuente: {nutrition.source}
+                    {nutrition.source.startsWith("INS") && " (Tablas Peruanas de Composición de Alimentos)"}.
+                    {Object.values(nutrition).includes(null) && " «—»: dato no disponible en la fuente."}
                   </p>
                 </>
               ) : (
