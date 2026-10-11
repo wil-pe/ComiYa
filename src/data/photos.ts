@@ -39,7 +39,9 @@ export const PHOTOS = {
     "zanahoria",
     "zapallo"
   ],
-  "categorias": [],
+  "categorias": [
+    "verduras"
+  ],
   "ambiente": [
     "mercado"
   ]
