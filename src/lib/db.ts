@@ -83,6 +83,11 @@ async function createSchema(sql: Sql) {
       ON orders (subscription_id, delivery_date) WHERE subscription_id IS NOT NULL`;
   await sql`CREATE INDEX IF NOT EXISTS orders_condo_date ON orders (condo_id, delivery_date)`;
   await sql`CREATE INDEX IF NOT EXISTS orders_user ON orders (user_id)`;
+  // Columnas agregadas después de la primera versión.
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS substitution TEXT NOT NULL DEFAULT 'similar'`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS refund INTEGER NOT NULL DEFAULT 0`;
+  await sql`ALTER TABLE orders ADD COLUMN IF NOT EXISTS refund_note TEXT NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS substitution TEXT NOT NULL DEFAULT 'similar'`;
   await sql`
     CREATE TABLE IF NOT EXISTS product_prices (
       product_id TEXT PRIMARY KEY,

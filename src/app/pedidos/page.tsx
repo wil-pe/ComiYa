@@ -3,6 +3,7 @@ import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import { PAYMENT_METHODS, type PaymentMethod } from "@/config";
 import { deleteSubscription, toggleSubscription } from "@/actions/orders";
+import { ReorderButton } from "@/components/reorder-button";
 import { requireUser } from "@/lib/auth";
 import { getCatalog } from "@/lib/catalog";
 import { dayNamePlural, formatDateLong, formatTime, todayLima } from "@/lib/dates";
@@ -56,6 +57,7 @@ export default async function OrdersPage() {
   const past = orders.filter((o) => !upcoming.includes(o));
   const names = new Map(catalog.map((p) => [p.id, p]));
   const toPay = upcoming.filter((o) => o.status === "pendiente_pago");
+  const last = orders.find((o) => o.status !== "cancelado");
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 pt-6">
@@ -70,6 +72,20 @@ export default async function OrdersPage() {
         <p className="rounded-3xl bg-sun-soft p-4 font-bold text-amber-950">
           💰 Tienes {formatSoles(credit)} de saldo a favor. Se descuenta solo en tu próximo pedido.
         </p>
+      )}
+
+      {last && (
+        <section className="flex items-center justify-between gap-3 rounded-3xl bg-white p-4 ring-1 ring-stone-200">
+          <div className="min-w-0">
+            <p className="font-extrabold">¿Lo mismo de siempre?</p>
+            <p className="truncate text-sm text-stone-500">
+              {last.items.map((item) => item.name).join(", ")}
+            </p>
+          </div>
+          <ReorderButton items={last.items.map((item) => ({ id: item.id, qty: item.qty }))} className="shrink-0 rounded-full bg-leaf px-4 py-2.5 font-bold text-white">
+            🔁 Volver a pedir
+          </ReorderButton>
+        </section>
       )}
 
       {toPay.length > 0 && (

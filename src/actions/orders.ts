@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { BASE_DISCOUNT, MIN_ORDER_CENTS, PAYMENT_METHODS, type PaymentMethod } from "@/config";
+import { BASE_DISCOUNT, MIN_ORDER_CENTS, PAYMENT_METHODS, SUBSTITUTIONS, type PaymentMethod, type Substitution } from "@/config";
 import type { FormState } from "@/actions/auth";
 import { requireUser } from "@/lib/auth";
 import { getCatalog } from "@/lib/catalog";
@@ -13,6 +13,10 @@ import { formatSoles, totals } from "@/lib/pricing";
 
 function isPaymentMethod(value: string): value is PaymentMethod {
   return value in PAYMENT_METHODS;
+}
+
+function isSubstitution(value: string): value is Substitution {
+  return value in SUBSTITUTIONS;
 }
 
 export async function placeOrder(_: FormState, formData: FormData): Promise<FormState> {
@@ -28,6 +32,8 @@ export async function placeOrder(_: FormState, formData: FormData): Promise<Form
   const payment = String(formData.get("payment") ?? "");
   const repeat = formData.get("repeat") === "on";
   const notes = String(formData.get("notes") ?? "").trim().slice(0, 300);
+  const rawSubstitution = String(formData.get("substitution") ?? "");
+  const substitution: Substitution = isSubstitution(rawSubstitution) ? rawSubstitution : "similar";
 
   const catalog = await getCatalog();
   const { lines, unavailable } = resolveItems(catalog, requested);
@@ -47,8 +53,8 @@ export async function placeOrder(_: FormState, formData: FormData): Promise<Form
   if (repeat) {
     const items = lines.map(({ product, qty }) => ({ id: product.id, qty }));
     const [sub] = await sql`
-      INSERT INTO subscriptions (user_id, weekday, delivery_time, start_date, items, payment_method)
-      VALUES (${user.id}, ${weekdayOf(date)}, ${time}, ${date}, ${sql.json(items)}, ${payment})
+      INSERT INTO subscriptions (user_id, weekday, delivery_time, start_date, items, payment_method, substitution)
+      VALUES (${user.id}, ${weekdayOf(date)}, ${time}, ${date}, ${sql.json(items)}, ${payment}, ${substitution})
       RETURNING id`;
     subscriptionId = sub.id;
   }
@@ -62,6 +68,7 @@ export async function placeOrder(_: FormState, formData: FormData): Promise<Form
     paymentMethod: payment,
     subscriptionId,
     notes,
+    substitution,
   });
   if (!orderId) {
     if (subscriptionId) await sql`DELETE FROM subscriptions WHERE id = ${subscriptionId}`;

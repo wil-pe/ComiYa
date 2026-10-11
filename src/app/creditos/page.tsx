@@ -9,7 +9,9 @@ export default function CreditsPage() {
     <div className="mx-auto max-w-3xl px-4 pt-6">
       <h1 className="text-3xl font-black tracking-tight">Créditos de fotos</h1>
       <p className="mt-1 text-stone-600">
-        Las fotos de productos son referenciales. Gracias a los fotógrafos que las comparten libremente.
+        Las fotos de productos son referenciales. Gracias a los fotógrafos que las comparten libremente. Todas
+        fueron recortadas y comprimidas para la app; las fotos con licencia CC BY-SA se comparten bajo la misma
+        licencia.
       </p>
       <ul className="mt-5 grid gap-2 sm:grid-cols-2">
         {PHOTO_CREDITS.map((credit) => (

@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BRAND, PAYMENT_METHODS } from "@/config";
+import { BRAND, PAYMENT_METHODS, SUBSTITUTIONS } from "@/config";
 import { cancelOrder } from "@/actions/orders";
 import { ClearCart } from "./clear-cart";
 import { PaymentForm } from "./payment-form";
 import { GroupProgress } from "@/components/group-progress";
 import { InviteButton } from "@/components/invite-button";
 import { ProductPhoto } from "@/components/product-photo";
+import { ReorderButton } from "@/components/reorder-button";
 import { requireUser } from "@/lib/auth";
 import { formatCutoff, formatDateLong, formatTime, isOpenForOrders } from "@/lib/dates";
 import { db } from "@/lib/db";
@@ -116,6 +117,13 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/pe
         </div>
       )}
 
+      {order.refund > 0 && (
+        <p className="rounded-3xl bg-sun-soft p-4 font-bold text-amber-950">
+          💰 Te devolvimos {formatSoles(order.refund)} como saldo para tu próximo pedido
+          {order.refundNote ? `: ${order.refundNote}` : "."}
+        </p>
+      )}
+
       {earned > 0 && (
         <p className="rounded-3xl bg-sun-soft p-4 font-bold text-amber-950">
           👥 Al cierre se sumaron más vecinos (precio final −{percent(finalDiscount ?? 0)}). Te devolvimos{" "}
@@ -160,7 +168,17 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/pe
           <p className="pt-1 font-bold text-leaf">Ahorraste {formatSoles(order.superTotal - order.total)} 🎉</p>
         </dl>
         {order.notes && <p className="mt-3 rounded-xl bg-cream p-3 text-sm">📝 {order.notes}</p>}
+        <p className="mt-2 text-sm text-stone-500">
+          Si algo falta o no está fresco: <strong>{SUBSTITUTIONS[order.substitution]?.label ?? "—"}</strong>
+        </p>
       </section>
+
+      <ReorderButton
+        items={order.items.map((item) => ({ id: item.id, qty: item.qty }))}
+        className="w-full rounded-full bg-leaf py-3.5 text-lg font-extrabold text-white shadow-md shadow-leaf/20"
+      >
+        🔁 Volver a pedir lo mismo
+      </ReorderButton>
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <a

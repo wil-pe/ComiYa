@@ -2,6 +2,7 @@
 // Si un producto no tiene foto, la app muestra su emoji.
 export const PHOTOS = {
   "productos": [
+    "aji-amarillo",
     "ajo",
     "arroz",
     "asado-tira",
@@ -16,7 +17,9 @@ export const PHOTOS = {
     "chuleta-cerdo",
     "culantro",
     "fresa",
+    "granadilla",
     "hierbabuena",
+    "huacatay",
     "huevos",
     "jurel",
     "lechuga",
@@ -28,6 +31,7 @@ export const PHOTOS = {
     "palta",
     "papa-amarilla",
     "papa-blanca",
+    "papaya",
     "pechuga-pollo",
     "pepino",
     "perejil",
@@ -42,6 +46,7 @@ export const PHOTOS = {
     "rocoto",
     "tomate",
     "trucha",
+    "uva",
     "vainita",
     "zanahoria",
     "zapallo"
@@ -49,11 +54,14 @@ export const PHOTOS = {
   "categorias": [
     "basicos",
     "carnes",
+    "frutas",
+    "hierbas",
     "pescados",
     "pollo",
     "verduras"
   ],
   "ambiente": [
+    "entrega",
     "mercado"
   ]
 } as const;

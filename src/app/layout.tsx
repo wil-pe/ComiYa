@@ -21,10 +21,30 @@ const caveat = Caveat({
   weight: ["600", "700"],
 });
 
+const description =
+  "Pollo, carne, pescado, verduras y frutas del mercado, 25% más baratos que en el supermercado y entregados en tu condominio.";
+
+// URL pública, para que la vista previa en WhatsApp tenga imagen.
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: `${BRAND.name} · ${BRAND.tagline}`,
-  description:
-    "Pollo, carne, pescado, verduras y frutas del mercado, 25% más baratos que en el supermercado y entregados en tu condominio.",
+  description,
+  applicationName: BRAND.name,
+  appleWebApp: { title: BRAND.name, capable: true, statusBarStyle: "default" },
+  openGraph: {
+    type: "website",
+    locale: "es_PE",
+    siteName: BRAND.name,
+    title: `${BRAND.name} · El mercado, en tu puerta`,
+    description,
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 // Precios, fechas de entrega y sesión cambian en cada visita.

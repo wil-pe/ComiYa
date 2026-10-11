@@ -18,6 +18,22 @@ export async function setOrderStatus(formData: FormData) {
   revalidatePath("/admin");
 }
 
+/** Devuelve saldo a un pedido (producto que faltó, calidad, etc.). Reemplaza el monto anterior. */
+export async function refundOrder(formData: FormData) {
+  await requireAdmin();
+  const orderId = Number(formData.get("orderId"));
+  const soles = Number(String(formData.get("amount") ?? "").replace(",", "."));
+  const note = String(formData.get("note") ?? "").trim().slice(0, 120);
+  if (!Number.isInteger(orderId) || !Number.isFinite(soles) || soles < 0) return;
+  const sql = await db();
+  // Nunca más que lo que se cobró por el pedido.
+  await sql`
+    UPDATE orders SET refund = LEAST(${Math.round(soles * 100)}, total + credit_used),
+                      refund_note = ${note}, updated_at = now()
+    WHERE id = ${orderId}`;
+  revalidatePath("/admin");
+}
+
 export async function savePrices(_: FormState, formData: FormData): Promise<FormState> {
   await requireAdmin();
   const sql = await db();

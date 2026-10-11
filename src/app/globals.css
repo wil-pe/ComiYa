@@ -65,3 +65,27 @@ body {
   border: 6px solid var(--color-wood);
   box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.25), 0 10px 25px -10px rgb(0 0 0 / 0.5);
 }
+
+/* Ficha de producto (bottom sheet en el celular). */
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+dialog.ficha[open] {
+  animation: subir 0.25s ease-out;
+}
+@keyframes subir {
+  from {
+    transform: translateY(48px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  dialog.ficha[open] {
+    animation: none;
+  }
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-sun);
+  outline-offset: 2px;
+}

@@ -1,6 +1,6 @@
 import "server-only";
 import type postgres from "postgres";
-import { DELIVERY, type PaymentMethod } from "@/config";
+import { DELIVERY, type PaymentMethod, type Substitution } from "@/config";
 import { getCatalog, type Product } from "@/lib/catalog";
 import { addDays, availableDates, isOpenForOrders, todayLima, weekdayOf } from "@/lib/dates";
 import { db } from "@/lib/db";
@@ -26,6 +26,10 @@ export type Order = {
   paymentRef: string | null;
   status: OrderStatus;
   notes: string;
+  substitution: Substitution;
+  /** Saldo devuelto a mano por el equipo (producto faltante, calidad, etc.). */
+  refund: number;
+  refundNote: string;
   createdAt: Date;
 };
 
@@ -50,6 +54,9 @@ export function mapOrder(row: postgres.Row): Order {
     paymentRef: row.payment_ref,
     status: row.status,
     notes: row.notes,
+    substitution: row.substitution,
+    refund: row.refund,
+    refundNote: row.refund_note,
     createdAt: row.created_at,
   };
 }
@@ -122,14 +129,14 @@ export async function finalDiscountFor(order: Order): Promise<number | null> {
   return tierFor(counts.get(`${order.condoId}:${order.deliveryDate}`) ?? 0).discount;
 }
 
-/** Saldo a favor: lo devuelto por compras en grupo menos lo ya usado. */
+/** Saldo a favor: lo devuelto por compras en grupo y por el equipo, menos lo ya usado. */
 export async function creditBalance(userId: number, sqlArg?: Sql): Promise<number> {
   const sql = sqlArg ?? (await db());
   const rows = await sql`
     SELECT * FROM orders WHERE user_id = ${userId} AND status IN ${sql(PAID)}`;
   const closed = rows.map(mapOrder).filter((order) => !isOpenForOrders(order.deliveryDate));
   const counts = await finalCounts(sql, closed);
-  let earned = 0;
+  let earned = rows.reduce((sum, row) => sum + row.refund, 0);
   for (const order of closed) {
     const n = counts.get(`${order.condoId}:${order.deliveryDate}`) ?? 0;
     earned += creditEarned(order, tierFor(n).discount);
@@ -149,6 +156,7 @@ export async function createOrder(params: {
   paymentMethod: PaymentMethod;
   subscriptionId?: number | null;
   notes?: string;
+  substitution: Substitution;
 }): Promise<number | null> {
   const sql = await db();
   return sql.begin(async (tx) => {
@@ -171,11 +179,12 @@ export async function createOrder(params: {
     const total = subtotal - creditUsed + DELIVERY.fee;
     const [row] = await tx`
       INSERT INTO orders (user_id, condo_id, subscription_id, delivery_date, delivery_time, items,
-                          super_total, discount_bp, subtotal, credit_used, total, payment_method, notes)
+                          super_total, discount_bp, subtotal, credit_used, total, payment_method, notes,
+                          substitution)
       VALUES (${params.userId}, ${params.condoId}, ${params.subscriptionId ?? null}, ${params.date},
               ${params.time}, ${tx.json(items as unknown as postgres.JSONValue)}, ${superTotal},
               ${Math.round(discount * 10000)}, ${subtotal}, ${creditUsed}, ${total},
-              ${params.paymentMethod}, ${params.notes ?? ""})
+              ${params.paymentMethod}, ${params.notes ?? ""}, ${params.substitution})
       ON CONFLICT DO NOTHING
       RETURNING id`;
     return row?.id ?? null;
@@ -215,6 +224,7 @@ export async function generateRecurringOrders(now = new Date(), onlyUserId?: num
         time: sub.delivery_time,
         paymentMethod: sub.payment_method,
         subscriptionId: sub.id,
+        substitution: sub.substitution,
       });
       if (id) created++;
     }

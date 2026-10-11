@@ -1,4 +1,5 @@
 // Origen de cada foto de /public/fotos. Pexels y Unsplash no exigen atribución, pero la dejamos igual.
+// Las de Wikimedia Commons (CC BY-SA) sí la exigen: autor, licencia y aviso de que fueron modificadas.
 export type PhotoCredit = {
   file: string;
   subject: string;
@@ -9,6 +10,25 @@ export type PhotoCredit = {
 };
 
 export const PHOTO_CREDITS: PhotoCredit[] = [
+  { file: "/fotos/productos/culantro.webp", subject: "Culantro", source: "Pexels", author: "Rajesh S Balouria", license: "Licencia Pexels", url: "https://www.pexels.com/photo/10048317/" },
+  { file: "/fotos/productos/perejil.webp", subject: "Perejil", source: "Pexels", author: "Karola G", license: "Licencia Pexels", url: "https://www.pexels.com/photo/4021618/" },
+  { file: "/fotos/productos/hierbabuena.webp", subject: "Hierbabuena", source: "Pexels", author: "Rewat Wannasuk", license: "Licencia Pexels", url: "https://www.pexels.com/photo/214165/" },
+  { file: "/fotos/productos/huacatay.webp", subject: "Huacatay", source: "Wikimedia Commons", author: "Krzysztof Ziarnek (Kenraiz)", license: "CC BY-SA 4.0", url: "https://commons.wikimedia.org/wiki/File:Tagetes_minuta_kz01.jpg" },
+  { file: "/fotos/productos/aji-amarillo.webp", subject: "Ají amarillo", source: "Wikimedia Commons", author: "Luis Tamayo", license: "CC BY-SA 2.0", url: "https://commons.wikimedia.org/wiki/File:Aji_Amarillo_pepper.jpg" },
+  { file: "/fotos/productos/rocoto.webp", subject: "Rocoto", source: "Wikimedia Commons", author: "Sebastian Aguilar (DrCooling)", license: "CC BY-SA 4.0", url: "https://commons.wikimedia.org/wiki/File:Rocoto_034.jpg" },
+  { file: "/fotos/productos/limon.webp", subject: "Limón", source: "Pexels", author: "Lars H Knudsen", license: "Licencia Pexels", url: "https://www.pexels.com/photo/4590488/" },
+  { file: "/fotos/productos/platano.webp", subject: "Plátano de seda", source: "Pexels", author: "Kio", license: "Licencia Pexels", url: "https://www.pexels.com/photo/1093038/" },
+  { file: "/fotos/productos/manzana.webp", subject: "Manzana delicia", source: "Pexels", author: "Pierpaolo Riondato", license: "Licencia Pexels", url: "https://www.pexels.com/photo/2966150/" },
+  { file: "/fotos/productos/mandarina.webp", subject: "Mandarina", source: "Pexels", author: "julie aagaard", license: "Licencia Pexels", url: "https://www.pexels.com/photo/2294477/" },
+  { file: "/fotos/productos/naranja.webp", subject: "Naranja para jugo", source: "Pexels", author: "Paco Álamo", license: "Licencia Pexels", url: "https://www.pexels.com/photo/14982761/" },
+  { file: "/fotos/productos/papaya.webp", subject: "Papaya", source: "Pexels", author: "alleksana", license: "Licencia Pexels", url: "https://www.pexels.com/photo/4113812/" },
+  { file: "/fotos/productos/pina.webp", subject: "Piña golden", source: "Pexels", author: "Laker", license: "Licencia Pexels", url: "https://www.pexels.com/photo/6157052/" },
+  { file: "/fotos/productos/fresa.webp", subject: "Fresa", source: "Pexels", author: "David J.", license: "Licencia Pexels", url: "https://www.pexels.com/photo/1125122/" },
+  { file: "/fotos/productos/granadilla.webp", subject: "Granadilla", source: "Wikimedia Commons", author: "Ivar Leidus", license: "CC BY-SA 4.0", url: "https://commons.wikimedia.org/wiki/File:Sweet_granadillas_(Passiflora_ligularis)_-_whole_and_cross_section.jpg" },
+  { file: "/fotos/productos/uva.webp", subject: "Uva roja", source: "Pexels", author: "Jahra Tasfia Reza", license: "Licencia Pexels", url: "https://www.pexels.com/photo/39959332/" },
+  { file: "/fotos/categorias/hierbas.webp", subject: "Categoría Hierbas y ajíes", source: "Pexels", author: "Ömer Furkan Yakar", license: "Licencia Pexels", url: "https://www.pexels.com/photo/30931749/" },
+  { file: "/fotos/categorias/frutas.webp", subject: "Categoría Frutas", source: "Pexels", author: "Pavel Khlystunov", license: "Licencia Pexels", url: "https://www.pexels.com/photo/33115591/" },
+  { file: "/fotos/ambiente/entrega.webp", subject: "Bolsa de compras (Así de fácil)", source: "Pexels", author: "Sveta Moisseyeva", license: "Licencia Pexels", url: "https://www.pexels.com/photo/39070864/" },
   { file: "/fotos/productos/pollo-entero.webp", subject: "Pollo entero", source: "Pexels", author: "Karyna Panchenko", license: "Licencia Pexels", url: "https://www.pexels.com/photo/10842249/" },
   { file: "/fotos/productos/pechuga-pollo.webp", subject: "Pechuga de pollo", source: "Pexels", author: "Leeloo The First", license: "Licencia Pexels", url: "https://www.pexels.com/photo/5769384/" },
   { file: "/fotos/productos/pierna-pollo.webp", subject: "Pierna con encuentro", source: "Unsplash", author: "Rimsha Noor", license: "Licencia Unsplash", url: "https://unsplash.com/photos/_VhofEs6mmM" },

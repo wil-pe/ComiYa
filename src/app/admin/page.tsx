@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import type postgres from "postgres";
-import { PAYMENT_METHODS } from "@/config";
-import { setOrderStatus } from "@/actions/admin";
+import { PAYMENT_METHODS, SUBSTITUTIONS } from "@/config";
+import { refundOrder, setOrderStatus } from "@/actions/admin";
 import { formatPhone, requireAdmin } from "@/lib/auth";
 import { addDays, availableDates, formatDateLong, formatDateShort, formatTime, isValidDate, todayLima } from "@/lib/dates";
 import { db } from "@/lib/db";
@@ -32,6 +32,33 @@ function StatusForm({ order }: { order: AdminOrder }) {
         ))}
       </select>
       <button type="submit" className="rounded-full bg-ink px-3 py-1.5 text-sm font-bold text-white">
+        OK
+      </button>
+    </form>
+  );
+}
+
+function RefundForm({ order }: { order: AdminOrder }) {
+  return (
+    <form action={refundOrder} className="flex items-center gap-1 text-sm">
+      <input type="hidden" name="orderId" value={order.id} />
+      <span className="font-semibold text-stone-500">Devolver S/</span>
+      <input
+        name="amount"
+        inputMode="decimal"
+        defaultValue={order.refund ? (order.refund / 100).toFixed(2) : ""}
+        placeholder="0.00"
+        aria-label="Monto a devolver como saldo"
+        className="w-16 rounded-full border-0 bg-cream px-2 py-1 text-right font-bold ring-1 ring-stone-200"
+      />
+      <input
+        name="note"
+        defaultValue={order.refundNote}
+        placeholder="motivo"
+        aria-label="Motivo de la devolución"
+        className="w-24 rounded-full border-0 bg-cream px-2 py-1 ring-1 ring-stone-200"
+      />
+      <button type="submit" className="rounded-full bg-ink px-2.5 py-1 font-bold text-white">
         OK
       </button>
     </form>
@@ -247,7 +274,13 @@ export default async function AdminPage({ searchParams }: PageProps<"/admin">) {
                   {order.items.map((item) => `${item.emoji} ${item.name} ${formatQty(item.qty, item.unit)}`).join(" · ")}
                 </p>
                 {order.notes && <p className="mt-1 text-sm font-semibold text-amber-800">📝 {order.notes}</p>}
-                <p className="mt-1 text-sm font-black">Total {formatSoles(order.total)}</p>
+                <p className="mt-1 text-sm">
+                  Si falta algo: <strong>{SUBSTITUTIONS[order.substitution]?.label ?? "—"}</strong>
+                </p>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-black">Total {formatSoles(order.total)}</p>
+                  <RefundForm order={order} />
+                </div>
               </div>
             ))}
           </section>

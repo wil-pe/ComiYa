@@ -54,3 +54,21 @@ export const PAYMENT_METHODS = {
 } as const;
 
 export type PaymentMethod = keyof typeof PAYMENT_METHODS;
+
+// Qué hacer si un producto se acabó o no está fresco (una sola preferencia por pedido).
+export const SUBSTITUTIONS = {
+  similar: {
+    label: "Cámbialo por uno parecido",
+    hint: "Del mismo precio o menos. Si cuesta menos, la diferencia vuelve como saldo.",
+  },
+  quitar: {
+    label: "No lo traigas",
+    hint: "Te devolvemos lo que pagaste por ese producto como saldo.",
+  },
+  consultar: {
+    label: "Escríbeme por WhatsApp",
+    hint: "Te consultamos antes de decidir.",
+  },
+} as const;
+
+export type Substitution = keyof typeof SUBSTITUTIONS;

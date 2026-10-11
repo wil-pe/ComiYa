@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { BASE_DISCOUNT, GROUP_TIERS, MIN_ORDER_CENTS, PAYMENT_METHODS, type PaymentMethod } from "@/config";
+import {
+  BASE_DISCOUNT,
+  GROUP_TIERS,
+  MIN_ORDER_CENTS,
+  PAYMENT_METHODS,
+  SUBSTITUTIONS,
+  type PaymentMethod,
+  type Substitution,
+} from "@/config";
 import type { Product } from "@/data/products";
 import { placeOrder } from "@/actions/orders";
 import { cartLines } from "@/components/cart-bar";
@@ -38,6 +46,7 @@ export function Checkout({
   const [time, setTime] = useState("08:00");
   const [repeat, setRepeat] = useState(false);
   const [payment, setPayment] = useState<PaymentMethod>("yape");
+  const [substitution, setSubstitution] = useState<Substitution>("similar");
   const [notes, setNotes] = useState("");
   const [state, action, pending] = useActionState(placeOrder, undefined);
 
@@ -94,6 +103,37 @@ export function Checkout({
           + Agregar más productos
         </Link>
       </section>
+
+      {/* Qué hacer si falta algo: una sola preferencia, visible desde el carrito */}
+      <fieldset className="rounded-3xl bg-white p-4 ring-1 ring-stone-200">
+        <legend className="sr-only">Si algo se acabó o no está fresco</legend>
+        <p className="text-lg font-extrabold" aria-hidden>
+          Si algo se acabó o no está fresco…
+        </p>
+        <div className="mt-2 space-y-2">
+          {(Object.keys(SUBSTITUTIONS) as Substitution[]).map((key) => (
+            <label
+              key={key}
+              className={`flex cursor-pointer gap-3 rounded-2xl p-3 ring-1 transition ${
+                substitution === key ? "bg-leaf-soft ring-leaf" : "bg-cream ring-stone-200"
+              }`}
+            >
+              <input
+                type="radio"
+                name="substitution-choice"
+                value={key}
+                checked={substitution === key}
+                onChange={() => setSubstitution(key)}
+                className="mt-1 h-5 w-5 shrink-0 accent-leaf"
+              />
+              <span>
+                <span className="block font-bold">{SUBSTITUTIONS[key].label}</span>
+                <span className="block text-sm text-stone-600">{SUBSTITUTIONS[key].hint}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       {/* Entrega */}
       <section className="rounded-3xl bg-white p-4 ring-1 ring-stone-200">
@@ -264,6 +304,7 @@ export function Checkout({
             <input type="hidden" name="time" value={time} />
             <input type="hidden" name="payment" value={payment} />
             <input type="hidden" name="notes" value={notes} />
+            <input type="hidden" name="substitution" value={substitution} />
             {repeat && <input type="hidden" name="repeat" value="on" />}
             {state?.error && <p className="mb-3 rounded-xl bg-red-50 p-3 text-sm font-semibold text-red-700">{state.error}</p>}
             <button
