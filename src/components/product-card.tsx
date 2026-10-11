@@ -27,9 +27,9 @@ export function ProductCard({ product }: { product: Product }) {
           <p className="text-xs text-stone-500">
             Supermercado <span className="text-chili line-through">{formatSoles(product.superCents)}</span>
           </p>
-          <p className="pizarra mt-1 flex items-baseline justify-between gap-1 rounded-xl px-2.5 py-0.5 font-hand">
-            <span className="text-[1.65rem] leading-tight font-bold">{formatSoles(price)}</span>
-            <span className="text-base leading-none opacity-80">{unitLabel(product.unit)}</span>
+          <p className="pizarra mt-1 flex flex-wrap items-baseline justify-between gap-x-1 rounded-xl px-2.5 py-0.5 font-hand">
+            <span className="text-[1.65rem] leading-tight font-bold whitespace-nowrap">{formatSoles(price)}</span>
+            <span className="text-base leading-none whitespace-nowrap opacity-80">{unitLabel(product.unit)}</span>
           </p>
           <div className="mt-2">
             <QtyControl product={product} />

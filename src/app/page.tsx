@@ -4,7 +4,7 @@ import { BASE_DISCOUNT, DELIVERY, GROUP_TIERS, MIN_ORDER_CENTS, PAYMENT_METHODS 
 import { CATEGORIES, PRICES_OBSERVED_AT } from "@/data/products";
 import { getCatalog } from "@/lib/catalog";
 import { availableDates, formatCutoff, formatDateLong, formatTime } from "@/lib/dates";
-import { AMBIENTE, categoryImage } from "@/lib/images";
+import { ambianceImage, categoryImage } from "@/lib/images";
 import { formatSoles, lineTotal, percent, priceAt } from "@/lib/pricing";
 import { formatQty } from "@/lib/units";
 
@@ -41,19 +41,23 @@ export default async function Home() {
   const weeklySavings = superTotal - ourTotal;
   const nextDate = availableDates()[0];
   const featured = FEATURED.flatMap((id) => byId.get(id) ?? []);
+  const heroPhoto = ambianceImage("mercado");
+  const deliveryPhoto = ambianceImage("entrega");
 
   return (
     <div>
       {/* Hero: el puesto del mercado */}
-      <section className="relative isolate overflow-hidden">
-        <Image
-          src={AMBIENTE.mercado}
-          alt="Puesto de mercado lleno de frutas y verduras frescas"
-          fill
-          priority
-          sizes="100vw"
-          className="-z-10 object-cover"
-        />
+      <section className="relative isolate overflow-hidden bg-board">
+        {heroPhoto && (
+          <Image
+            src={heroPhoto}
+            alt="Puesto de mercado lleno de frutas y verduras frescas"
+            fill
+            priority
+            sizes="100vw"
+            className="-z-10 object-cover"
+          />
+        )}
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/75 via-black/55 to-black/80 md:bg-gradient-to-r md:from-black/80 md:via-black/55 md:to-black/30" />
         <div className="mx-auto grid max-w-5xl items-center gap-8 px-4 pt-10 pb-12 sm:pt-16 md:grid-cols-[1.1fr_1fr]">
           <div className="text-white">
@@ -149,13 +153,19 @@ export default async function Home() {
               href={`/productos#${category.id}`}
               className="group relative aspect-[4/3] overflow-hidden rounded-3xl bg-board"
             >
-              <Image
-                src={categoryImage(category.id)}
-                alt=""
-                fill
-                sizes="(min-width: 640px) 25vw, 50vw"
-                className="object-cover transition duration-500 group-hover:scale-105"
-              />
+              {categoryImage(category.id) ? (
+                <Image
+                  src={categoryImage(category.id)!}
+                  alt=""
+                  fill
+                  sizes="(min-width: 640px) 25vw, 50vw"
+                  className="object-cover transition duration-500 group-hover:scale-105"
+                />
+              ) : (
+                <span className="absolute inset-0 flex items-center justify-center pb-6 text-5xl" aria-hidden>
+                  {category.emoji}
+                </span>
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
               <span className="absolute bottom-2 left-3 font-hand text-2xl leading-none font-bold text-white sm:text-3xl">
                 {category.label}
@@ -176,13 +186,17 @@ export default async function Home() {
       <section className="bg-white py-12">
         <div className="mx-auto grid max-w-5xl gap-8 px-4 md:grid-cols-[1fr_1.25fr] md:items-center">
           <div className="relative aspect-video overflow-hidden rounded-3xl bg-kraft md:aspect-[4/5]">
-            <Image
-              src={AMBIENTE.entrega}
-              alt="Bolsa de compras llena de verduras frescas"
-              fill
-              sizes="(min-width: 768px) 40vw, 100vw"
-              className="object-cover"
-            />
+            {deliveryPhoto ? (
+              <Image
+                src={deliveryPhoto}
+                alt="Bolsa de compras llena de verduras frescas"
+                fill
+                sizes="(min-width: 768px) 40vw, 100vw"
+                className="object-cover"
+              />
+            ) : (
+              <span className="absolute inset-0 flex items-center justify-center text-7xl" aria-hidden>🛍️</span>
+            )}
             <span className="absolute bottom-3 left-3 rotate-[-3deg] rounded-xl bg-sun px-3 py-1 font-hand text-2xl font-bold text-ink shadow">
               ¡Listo en tu puerta!
             </span>

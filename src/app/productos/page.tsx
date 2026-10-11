@@ -10,6 +10,15 @@ import { percent } from "@/lib/pricing";
 
 export const metadata: Metadata = { title: "Productos · ComiYa" };
 
+function CategoryThumb({ id, emoji }: { id: string; emoji: string }) {
+  const src = categoryImage(id);
+  return (
+    <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-kraft">
+      {src ? <Image src={src} alt="" fill sizes="32px" className="object-cover" /> : emoji}
+    </span>
+  );
+}
+
 export default async function ProductsPage() {
   const catalog = await getCatalog();
   const nextDate = availableDates()[0];
@@ -34,9 +43,7 @@ export default async function ProductsPage() {
             href={`#${category.id}`}
             className="flex shrink-0 items-center gap-2 rounded-full bg-white py-1 pr-3.5 pl-1 text-sm font-bold whitespace-nowrap ring-1 ring-stone-200 hover:ring-leaf"
           >
-            <span className="relative h-8 w-8 overflow-hidden rounded-full bg-kraft">
-              <Image src={categoryImage(category.id)} alt="" fill sizes="32px" className="object-cover" />
-            </span>
+            <CategoryThumb id={category.id} emoji={category.emoji} />
             {category.label}
           </a>
         ))}
@@ -45,10 +52,13 @@ export default async function ProductsPage() {
       {CATEGORIES.map((category) => {
         const products = catalog.filter((p) => p.category === category.id);
         if (!products.length) return null;
+        const banner = categoryImage(category.id);
         return (
           <section key={category.id} id={category.id} className="scroll-mt-32 pt-6">
             <div className="relative h-24 overflow-hidden rounded-3xl bg-board sm:h-28">
-              <Image src={categoryImage(category.id)} alt="" fill sizes="(min-width: 1024px) 1000px, 100vw" className="object-cover" />
+              {banner && (
+                <Image src={banner} alt="" fill sizes="(min-width: 1024px) 1000px, 100vw" className="object-cover" />
+              )}
               <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-transparent" />
               <h2 className="absolute bottom-2 left-4 font-hand text-4xl font-bold text-white drop-shadow sm:text-5xl">
                 {category.label}

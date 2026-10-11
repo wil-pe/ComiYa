@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { productImage } from "@/lib/images";
 
-/** Foto del producto; el emoji queda detrás por si la foto no carga. */
+/** Foto del producto, o su emoji mientras no tenga foto. */
 export function ProductPhoto({
   id,
   emoji,
@@ -15,12 +15,16 @@ export function ProductPhoto({
   sizes?: string;
   priority?: boolean;
 }) {
+  const src = productImage(id);
   return (
     <div className={`relative overflow-hidden bg-kraft/50 ${className}`}>
-      <span className="absolute inset-0 flex items-center justify-center text-3xl" aria-hidden>
-        {emoji}
-      </span>
-      <Image src={productImage(id)} alt="" fill sizes={sizes} priority={priority} className="object-cover" />
+      {src ? (
+        <Image src={src} alt="" fill sizes={sizes} priority={priority} className="object-cover" />
+      ) : (
+        <span className="absolute inset-0 flex items-center justify-center text-4xl" aria-hidden>
+          {emoji}
+        </span>
+      )}
     </div>
   );
 }
