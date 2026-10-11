@@ -1,8 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import { BASE_DISCOUNT, DELIVERY, GROUP_TIERS, MIN_ORDER_CENTS, PAYMENT_METHODS } from "@/config";
-import { PRICES_OBSERVED_AT } from "@/data/products";
+import { CATEGORIES, PRICES_OBSERVED_AT } from "@/data/products";
 import { getCatalog } from "@/lib/catalog";
 import { availableDates, formatCutoff, formatDateLong, formatTime } from "@/lib/dates";
+import { AMBIENTE, categoryImage } from "@/lib/images";
 import { formatSoles, lineTotal, percent, priceAt } from "@/lib/pricing";
 import { formatQty } from "@/lib/units";
 
@@ -24,6 +26,9 @@ const BASKET: [string, number][] = [
   ["mandarina", 2],
 ];
 
+// Productos que se muestran en la pizarra de la portada.
+const FEATURED = ["pollo-entero", "pechuga-pollo", "carne-molida", "papa-amarilla", "tomate", "palta"];
+
 export default async function Home() {
   const catalog = await getCatalog();
   const byId = new Map(catalog.map((p) => [p.id, p]));
@@ -35,114 +40,178 @@ export default async function Home() {
   const ourTotal = basket.reduce((sum, l) => sum + lineTotal(priceAt(l.product.superCents), l.qty), 0);
   const weeklySavings = superTotal - ourTotal;
   const nextDate = availableDates()[0];
+  const featured = FEATURED.flatMap((id) => byId.get(id) ?? []);
 
   return (
     <div>
-      {/* Hero */}
-      <section className="mx-auto max-w-5xl px-4 pt-8 pb-10 sm:pt-14">
-        <div className="grid items-center gap-8 md:grid-cols-[1.15fr_1fr]">
-          <div>
-            <p className="inline-flex items-center gap-2 rounded-full bg-sun-soft px-3 py-1 text-sm font-bold text-amber-900">
+      {/* Hero: el puesto del mercado */}
+      <section className="relative isolate overflow-hidden">
+        <Image
+          src={AMBIENTE.mercado}
+          alt="Puesto de mercado lleno de frutas y verduras frescas"
+          fill
+          priority
+          sizes="100vw"
+          className="-z-10 object-cover"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/75 via-black/55 to-black/80 md:bg-gradient-to-r md:from-black/80 md:via-black/55 md:to-black/30" />
+        <div className="mx-auto grid max-w-5xl items-center gap-8 px-4 pt-10 pb-12 sm:pt-16 md:grid-cols-[1.1fr_1fr]">
+          <div className="text-white">
+            <p className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm font-bold backdrop-blur">
               🏢 Para condominios de Lima · piloto
             </p>
-            <h1 className="mt-4 text-4xl leading-[1.05] font-black tracking-tight sm:text-5xl">
+            <p className="mt-4 font-hand text-3xl leading-none text-sun">¡Casero, casera!</p>
+            <h1 className="mt-1 text-4xl leading-[1.05] font-black tracking-tight sm:text-5xl">
               El mercado, en tu puerta.
-              <span className="block text-leaf">{percent(BASE_DISCOUNT)} más barato que el supermercado.</span>
+              <span className="block text-sun">{percent(BASE_DISCOUNT)} más barato que el supermercado.</span>
             </h1>
-            <p className="mt-4 text-lg text-stone-600">
+            <p className="mt-4 text-lg text-white/85">
               Pollo, carne, pescado, verduras, frutas y hierbas frescas del mercado. Tú eliges el día y la hora,
               nosotros hacemos las compras y te las llevamos a tu depa.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/productos"
-                className="rounded-full bg-leaf px-6 py-3.5 text-center text-lg font-extrabold text-white shadow-md shadow-leaf/20 hover:bg-leaf-dark"
+                className="rounded-full bg-sun px-6 py-3.5 text-center text-lg font-extrabold text-ink shadow-md hover:brightness-105"
               >
                 Ver productos y precios
               </Link>
               <Link
                 href="/registro"
-                className="rounded-full bg-white px-6 py-3.5 text-center text-lg font-bold ring-1 ring-stone-300 hover:ring-stone-400"
+                className="rounded-full bg-white/15 px-6 py-3.5 text-center text-lg font-bold ring-1 ring-white/40 backdrop-blur hover:bg-white/25"
               >
                 Crear mi cuenta
               </Link>
             </div>
-            <ul className="mt-6 flex flex-wrap gap-2 text-sm font-semibold text-stone-700">
-              <li className="rounded-full bg-white px-3 py-1.5 ring-1 ring-stone-200">🚚 Entrega gratis</li>
-              <li className="rounded-full bg-white px-3 py-1.5 ring-1 ring-stone-200">📱 Pagas con Yape o Plin</li>
-              <li className="rounded-full bg-white px-3 py-1.5 ring-1 ring-stone-200">🔁 Pedido fijo cada semana</li>
+            <ul className="mt-6 flex flex-wrap gap-2 text-sm font-semibold">
+              <li className="rounded-full bg-white/15 px-3 py-1.5 backdrop-blur">🚚 Entrega gratis</li>
+              <li className="rounded-full bg-white/15 px-3 py-1.5 backdrop-blur">📱 Pagas con Yape o Plin</li>
+              <li className="rounded-full bg-white/15 px-3 py-1.5 backdrop-blur">🔁 Pedido fijo cada semana</li>
             </ul>
           </div>
 
-          {/* Comparación de canasta */}
-          <div className="rounded-[2rem] bg-white p-5 shadow-xl shadow-stone-300/40 ring-1 ring-stone-200">
-            <p className="text-sm font-bold text-stone-500">Canasta familiar de la semana</p>
-            <div className="mt-3 space-y-2">
-              <div className="flex items-baseline justify-between">
-                <span className="font-semibold text-stone-600">En el supermercado</span>
-                <span className="text-xl font-bold whitespace-nowrap text-chili line-through decoration-2">{formatSoles(superTotal)}</span>
-              </div>
-              <div className="flex items-baseline justify-between">
-                <span className="font-semibold">Con ComiYa, en tu puerta</span>
-                <span className="text-3xl font-black whitespace-nowrap text-leaf">{formatSoles(ourTotal)}</span>
-              </div>
-            </div>
-            <div className="mt-4 rounded-2xl bg-sun-soft p-4 text-center">
-              <p className="text-sm font-bold text-amber-900">Ahorras cada semana</p>
-              <p className="text-4xl font-black text-ink">{formatSoles(weeklySavings)}</p>
-              <p className="text-sm font-semibold text-amber-900">
-                ≈ {formatSoles(weeklySavings * 4)} al mes, sin hacer colas ni cargar bolsas
+          {/* Pizarra de precios */}
+          <div className="pizarra marco-madera -rotate-1 rounded-2xl p-5 font-hand">
+            <p className="text-center text-4xl leading-none font-bold">Precios de hoy</p>
+            <p className="mt-1 text-center text-lg opacity-70">supermercado → ComiYa</p>
+            <ul className="mt-4 space-y-1.5 text-xl sm:text-2xl">
+              {featured.map((product) => (
+                <li key={product.id} className="flex items-baseline gap-2">
+                  <span className="whitespace-nowrap">
+                    {product.name} <span className="text-base opacity-60">{product.unit === "kg" ? "kg" : ""}</span>
+                  </span>
+                  <span className="flex-1 border-b-2 border-dotted border-white/20" />
+                  <span className="text-base whitespace-nowrap line-through opacity-55 sm:text-lg">
+                    {formatSoles(product.superCents)}
+                  </span>
+                  <span className="font-bold whitespace-nowrap text-sun">{formatSoles(priceAt(product.superCents))}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5 rounded-xl border-2 border-dashed border-white/30 p-3 text-center">
+              <p className="text-xl leading-tight">Tu canasta de la semana</p>
+              <p className="text-xl leading-tight">
+                <span className="line-through opacity-60">{formatSoles(superTotal)}</span> →{" "}
+                <span className="font-bold">{formatSoles(ourTotal)}</span>
               </p>
+              <p className="text-4xl leading-tight font-bold text-sun">¡Ahorras {formatSoles(weeklySavings)}!</p>
+              <p className="text-lg opacity-80">≈ {formatSoles(weeklySavings * 4)} al mes, sin colas ni bolsas</p>
             </div>
-            <details className="mt-3 text-sm">
-              <summary className="cursor-pointer font-semibold text-stone-500">¿Qué lleva la canasta?</summary>
+            <details className="mt-3 font-sans text-sm">
+              <summary className="cursor-pointer font-semibold opacity-75">¿Qué lleva la canasta?</summary>
               <ul className="mt-2 space-y-1">
                 {basket.map(({ product, qty }) => (
                   <li key={product.id} className="flex justify-between gap-2">
                     <span>
-                      {product.emoji} {product.name} · {formatQty(qty, product.unit)}
+                      {product.name} · {formatQty(qty, product.unit)}
                     </span>
                     <span className="whitespace-nowrap">
-                      <span className="text-stone-400 line-through">{formatSoles(lineTotal(product.superCents, qty))}</span>{" "}
-                      <strong className="text-leaf">{formatSoles(lineTotal(priceAt(product.superCents), qty))}</strong>
+                      <span className="line-through opacity-50">{formatSoles(lineTotal(product.superCents, qty))}</span>{" "}
+                      <strong className="text-sun">{formatSoles(lineTotal(priceAt(product.superCents), qty))}</strong>
                     </span>
                   </li>
                 ))}
               </ul>
             </details>
-            <p className="mt-3 text-xs text-stone-400">
-              Precios de supermercado tomados de Tottus el {PRICES_OBSERVED_AT}.
-            </p>
+            <p className="mt-2 font-sans text-xs opacity-55">Precios de supermercado: Tottus, {PRICES_OBSERVED_AT}.</p>
           </div>
+        </div>
+      </section>
+
+      {/* Qué hay en el puesto */}
+      <section className="mx-auto max-w-5xl px-4 py-10">
+        <p className="font-hand text-2xl leading-none text-leaf">Fresquito, del mercado a tu mesa</p>
+        <h2 className="text-3xl font-black tracking-tight">¿Qué hay en el puesto?</h2>
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {CATEGORIES.map((category) => (
+            <Link
+              key={category.id}
+              href={`/productos#${category.id}`}
+              className="group relative aspect-[4/3] overflow-hidden rounded-3xl bg-board"
+            >
+              <Image
+                src={categoryImage(category.id)}
+                alt=""
+                fill
+                sizes="(min-width: 640px) 25vw, 50vw"
+                className="object-cover transition duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+              <span className="absolute bottom-2 left-3 font-hand text-2xl leading-none font-bold text-white sm:text-3xl">
+                {category.label}
+              </span>
+            </Link>
+          ))}
+          <Link
+            href="/productos"
+            className="flex aspect-[4/3] flex-col items-center justify-center rounded-3xl bg-leaf p-3 text-center text-white"
+          >
+            <span className="font-hand text-3xl leading-none font-bold">Ver todo</span>
+            <span className="mt-1 text-sm font-semibold text-white/80">{catalog.length} productos →</span>
+          </Link>
         </div>
       </section>
 
       {/* Cómo funciona */}
       <section className="bg-white py-12">
-        <div className="mx-auto max-w-5xl px-4">
-          <h2 className="text-3xl font-black tracking-tight">Así de fácil</h2>
-          <ol className="mt-6 grid gap-4 sm:grid-cols-3">
-            {[
-              ["🛒", "Elige tus productos", "Los de siempre: pollo, carne, pescado, verduras, frutas y hierbas. Ves el precio del súper y el nuestro."],
-              ["📅", "Elige día y hora", "Por ejemplo: todos los martes a las 8:15 a. m. Lo programas una vez y llega solo cada semana."],
-              ["📲", "Paga con Yape o Plin", "Escaneas el QR, pagas y listo. Te lo dejamos en tu condominio, fresquito del mercado."],
-            ].map(([emoji, title, text], i) => (
-              <li key={title} className="rounded-3xl bg-cream p-5">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-2xl shadow-sm">{emoji}</span>
-                  <span className="text-sm font-black text-leaf">PASO {i + 1}</span>
-                </div>
-                <h3 className="mt-3 text-xl font-extrabold">{title}</h3>
-                <p className="mt-1 text-stone-600">{text}</p>
-              </li>
-            ))}
-          </ol>
-          {nextDate && (
-            <p className="mt-6 rounded-2xl bg-leaf-soft px-4 py-3 font-semibold text-leaf-dark">
-              📦 Próxima entrega disponible: <strong>{formatDateLong(nextDate)}</strong> · pide hasta el{" "}
-              {formatCutoff(nextDate)}.
-            </p>
-          )}
+        <div className="mx-auto grid max-w-5xl gap-8 px-4 md:grid-cols-[1fr_1.25fr] md:items-center">
+          <div className="relative aspect-video overflow-hidden rounded-3xl bg-kraft md:aspect-[4/5]">
+            <Image
+              src={AMBIENTE.entrega}
+              alt="Bolsa de compras llena de verduras frescas"
+              fill
+              sizes="(min-width: 768px) 40vw, 100vw"
+              className="object-cover"
+            />
+            <span className="absolute bottom-3 left-3 rotate-[-3deg] rounded-xl bg-sun px-3 py-1 font-hand text-2xl font-bold text-ink shadow">
+              ¡Listo en tu puerta!
+            </span>
+          </div>
+          <div>
+            <h2 className="text-3xl font-black tracking-tight">Así de fácil</h2>
+            <ol className="mt-5 space-y-3">
+              {[
+                ["🛒", "Elige tus productos", "Los de siempre: pollo, carne, pescado, verduras, frutas y hierbas. Ves el precio del súper y el nuestro."],
+                ["📅", "Elige día y hora", "Por ejemplo: todos los martes a las 8:15 a. m. Lo programas una vez y llega solo cada semana."],
+                ["📲", "Paga con Yape o Plin", "Escaneas el QR, pagas y listo. Te lo dejamos en tu condominio, fresquito del mercado."],
+              ].map(([emoji, title, text], i) => (
+                <li key={title} className="flex gap-4 rounded-3xl bg-cream p-4">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-2xl shadow-sm">{emoji}</span>
+                  <div>
+                    <p className="text-xs font-black tracking-wide text-leaf">PASO {i + 1}</p>
+                    <h3 className="text-lg leading-tight font-extrabold">{title}</h3>
+                    <p className="mt-0.5 text-stone-600">{text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            {nextDate && (
+              <p className="mt-4 rounded-2xl bg-leaf-soft px-4 py-3 font-semibold text-leaf-dark">
+                📦 Próxima entrega disponible: <strong>{formatDateLong(nextDate)}</strong> · pide hasta el{" "}
+                {formatCutoff(nextDate)}.
+              </p>
+            )}
+          </div>
         </div>
       </section>
 

@@ -8,6 +8,7 @@ import { placeOrder } from "@/actions/orders";
 import { cartLines } from "@/components/cart-bar";
 import { useCart } from "@/components/cart-store";
 import { GroupProgress } from "@/components/group-progress";
+import { ProductPhoto } from "@/components/product-photo";
 import { QtyControl } from "@/components/qty-control";
 import { dayNamePlural, formatTime, slotOptions, weekdayOf } from "@/lib/dates";
 import { formatSoles, lineTotal, percent, priceAt, tierFor, totals } from "@/lib/pricing";
@@ -70,7 +71,7 @@ export function Checkout({
         <ul className="divide-y divide-stone-100">
           {lines.map(({ product, qty }) => (
             <li key={product.id} className="flex items-center gap-3 py-3">
-              <span className="text-3xl" aria-hidden>{product.emoji}</span>
+              <ProductPhoto id={product.id} emoji={product.emoji} className="h-14 w-14 shrink-0 rounded-2xl" sizes="56px" />
               <div className="min-w-0 flex-1">
                 <p className="leading-tight font-bold">{product.name}</p>
                 <p className="text-sm">

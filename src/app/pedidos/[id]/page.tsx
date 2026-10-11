@@ -8,6 +8,7 @@ import { ClearCart } from "./clear-cart";
 import { PaymentForm } from "./payment-form";
 import { GroupProgress } from "@/components/group-progress";
 import { InviteButton } from "@/components/invite-button";
+import { ProductPhoto } from "@/components/product-photo";
 import { requireUser } from "@/lib/auth";
 import { formatCutoff, formatDateLong, formatTime, isOpenForOrders } from "@/lib/dates";
 import { db } from "@/lib/db";
@@ -127,8 +128,11 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/pe
         <ul className="mt-2 divide-y divide-stone-100">
           {order.items.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-3 py-2">
-              <span>
-                {item.emoji} {item.name} <span className="text-stone-500">· {formatQty(item.qty, item.unit)}</span>
+              <span className="flex items-center gap-3">
+                <ProductPhoto id={item.id} emoji={item.emoji} className="h-11 w-11 shrink-0 rounded-xl" sizes="44px" />
+                <span>
+                  {item.name} <span className="text-stone-500">· {formatQty(item.qty, item.unit)}</span>
+                </span>
               </span>
               <span className="font-bold whitespace-nowrap">{formatSoles(lineTotal(item.price, item.qty))}</span>
             </li>

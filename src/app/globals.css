@@ -28,3 +28,40 @@ body {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+@theme {
+  --font-hand: var(--font-caveat), "Comic Sans MS", cursive;
+  --color-board: #24302a;
+  --color-wood: #9a6a43;
+  --color-kraft: #e9d8b8;
+}
+
+/* Toldo a rayas, como el de los puestos del mercado. */
+.toldo {
+  height: 16px;
+  background: repeating-linear-gradient(90deg, var(--color-leaf) 0 28px, #ffffff 28px 56px);
+}
+.toldo::after {
+  content: "";
+  position: absolute;
+  inset: 100% 0 auto 0;
+  height: 10px;
+  background:
+    radial-gradient(circle at 14px 0, var(--color-leaf) 13.5px, transparent 14px) 0 0 / 56px 14px repeat-x,
+    radial-gradient(circle at 42px 0, #ffffff 13.5px, transparent 14px) 0 0 / 56px 14px repeat-x;
+  filter: drop-shadow(0 2px 1px rgb(0 0 0 / 0.12));
+}
+
+/* Pizarra de precios escrita con tiza. */
+.pizarra {
+  background-color: var(--color-board);
+  background-image:
+    radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+    linear-gradient(160deg, rgb(255 255 255 / 0.06), transparent 60%);
+  background-size: 5px 5px, 100% 100%;
+  color: #f8f4ea;
+}
+.marco-madera {
+  border: 6px solid var(--color-wood);
+  box-shadow: inset 0 0 0 2px rgb(0 0 0 / 0.25), 0 10px 25px -10px rgb(0 0 0 / 0.5);
+}
